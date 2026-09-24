@@ -98,11 +98,11 @@ function State:keypressed(key)
     end
   end
   if key == "g" then --garbage collector
-    print('GARBAGE_COLLECTOR')
+    print("GARBAGE_COLLECTOR")
     collectgarbage()
   end
   if key == "p" then --pause
     -- self:set(states[1])
-    print('PAUSE')
+    print("PAUSE")
   end
 end

@@ -28,8 +28,8 @@ function love.load()
   handleVsyncPropertyChange()
 
   Global.propertiesEvents = Events:new(false)
-  Global.propertiesEvents:hook('AUDIO', handleAudioPropertyChange)
-  Global.propertiesEvents:hook('VSYNC', handleVsyncPropertyChange)
+  Global.propertiesEvents:hook("AUDIO", handleAudioPropertyChange)
+  Global.propertiesEvents:hook("VSYNC", handleVsyncPropertyChange)
 
   Global.scores = Scores:new("scores", 10)
   Global.scores:load()
