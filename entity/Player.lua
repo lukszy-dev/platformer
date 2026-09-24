@@ -1,8 +1,8 @@
 require "entity.Ammo"
 require "utils.Animation"
-require "entity.player.PlayerInput"
-require "entity.player.PlayerPhysics"
-require "entity.player.PlayerCombat"
+local PlayerInput = require "entity.player.PlayerInput"
+local PlayerPhysics = require "entity.player.PlayerPhysics"
+local PlayerCombat = require "entity.player.PlayerCombat"
 
 local Quad = love.graphics.newQuad
 
