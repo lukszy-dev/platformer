@@ -11,11 +11,12 @@ local STATE_NAMES = require "state.constants.StateNames"
 
 State = {}
 
-function State:new()
+function State:new(context)
   local object = {
     name = "",
     currentState = {},
-    lastSelectedItem = 1
+    lastSelectedItem = 1,
+    context = context or Global.context
   }
   setmetatable(object, { __index = State })
   return object
@@ -36,8 +37,11 @@ function State:set(name, additionalConfig)
     StateToSet = STATES[name]
   end
 
+  self.context = self.context or Global.context
+
   local config = {
-    lastSelectedItem = self.lastSelectedItem
+    lastSelectedItem = self.lastSelectedItem,
+    context = self.context
   }
 
   if (additionalConfig) then
@@ -90,7 +94,12 @@ function State:keypressed(key)
     end
   end
   if key == "escape" then
-    mainTheme:stop()
+    if self.context and self.context.mainTheme then
+      self.context.mainTheme:stop()
+    elseif mainTheme then
+      mainTheme:stop()
+    end
+
     if self.currentState.parentMenu then
       self:set(self.currentState.parentMenu)
     else

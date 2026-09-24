@@ -7,6 +7,7 @@ function Button:new(objectName, buttonX, buttonY, buttonProperties)
     name = objectName,
     x = buttonX,
     y = buttonY,
+    context = Global and Global.context or nil,
     width = 8,
     height = 8,
     iterator = 1,
@@ -23,6 +24,8 @@ end
 local clicked = false
 
 function Button:update(dt, world)
+  local sound = (self.context and self.context.soundEvents) or soundEvents
+
   if self:touchesObject(world.player) then
     --[[if player.ySpeed > 0 then
       player.y = self.y - self.height + 1
@@ -34,13 +37,17 @@ function Button:update(dt, world)
       end
       --table.insert(Global.enemies, Behemoth:new('behemoth_0', 0, 28))
       self.isPressed = true
-      soundEvents:play("click_on")
+      if sound then
+        sound:play("click_on")
+      end
     end
     self.iterator = 2
     clicked = true
   else
     if clicked then
-      soundEvents:play("click_off")
+      if sound then
+        sound:play("click_off")
+      end
       clicked = false
     end
     self.isPressed = false
@@ -49,7 +56,8 @@ function Button:update(dt, world)
 end
 
 function Button:draw()
-  love.graphics.draw(sprite, self.animationQuads[self.iterator], self.x - (self.width / 2),
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  love.graphics.draw(spriteAsset, self.animationQuads[self.iterator], self.x - (self.width / 2),
     self.y - (self.height / 2))
 end
 

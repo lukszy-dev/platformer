@@ -9,6 +9,7 @@ local Global = {
   windowHeight = love.graphics.getHeight(),
   windowWidth = love.graphics.getWidth(),
 
+  context = nil,
   properties = {},
   scores = {},
 

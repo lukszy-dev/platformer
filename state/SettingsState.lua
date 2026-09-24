@@ -4,11 +4,12 @@ local Global = require "Global"
 
 SettingsState = {}
 
-function SettingsState:new()
+function SettingsState:new(config)
   local object = {
     parentMenu = "menu",
     menuItems = {},
-    entrySelected = 1
+    entrySelected = 1,
+    context = (config and config.context) or Global.context
   }
   setmetatable(object, { __index = SettingsState })
   return object
@@ -53,7 +54,11 @@ function SettingsState:keypressed(key)
       self.entrySelected = #self.menuItems
     end
 
-    soundEvents:play("select")
+    if self.context and self.context.soundEvents then
+      self.context.soundEvents:play("select")
+    elseif soundEvents then
+      soundEvents:play("select")
+    end
   end
   if key == "down" then
     self.menuItems[self.entrySelected]:select(false)
@@ -63,7 +68,11 @@ function SettingsState:keypressed(key)
       self.entrySelected = 1
     end
 
-    soundEvents:play("select")
+    if self.context and self.context.soundEvents then
+      self.context.soundEvents:play("select")
+    elseif soundEvents then
+      soundEvents:play("select")
+    end
   end
   if key == "left" or key == "right" then
     local name, value = unpack(Global.properties.properties[self.entrySelected])

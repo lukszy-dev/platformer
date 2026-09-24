@@ -20,7 +20,7 @@ local ENTITY_TYPES = require "constants.EntityTypes"
 
 World = {}
 
-function World:new()
+function World:new(config)
   local object = {
     camera = {},
     map = {},
@@ -29,7 +29,8 @@ function World:new()
     player = {},
     entities = {},
     gravity = 760, --800
-    score = 0
+    score = 0,
+    context = (config and config.context) or Global.context
   }
 
   object.camera = Camera:new()
@@ -66,6 +67,7 @@ function World:init(level)
 
       if Entity then
         local entityObject = Entity:new(objectName, objectPosX, objectPosY, object.properties)
+        entityObject.context = self.context
 
         if objectType == ENTITY_NAMES.PLAYER then
           self.player = entityObject
@@ -100,6 +102,9 @@ function World:update(dt)
 end
 
 function World:draw()
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  local hudAsset = (self.context and self.context.assets and self.context.assets.hud) or hud
+
   self.camera:set()
 
   self.map:draw()
@@ -120,15 +125,15 @@ function World:draw()
   end
 
   --[[ Draw HUD --]]
-  love.graphics.draw(hud, love.graphics.getWidth() - 168, 10, 0, 4, 4)
+  love.graphics.draw(hudAsset, love.graphics.getWidth() - 168, 10, 0, 4, 4)
   love.graphics.print({ { 196 / 255, 207 / 255, 161 / 255 }, self.score }, 10, 5)
 
   for i = 1, self.player.hitpoints do
-    love.graphics.draw(sprite, heart, love.graphics.getWidth() - 20 - (i * 28), 22, 0, 4, 4)
+    love.graphics.draw(spriteAsset, heart, love.graphics.getWidth() - 20 - (i * 28), 22, 0, 4, 4)
   end
 
   for i = 1, (5 - self.player.firedShots) do
-    love.graphics.draw(sprite, clip, love.graphics.getWidth() - 20 - (i * 28), 46, 0, 4, 4)
+    love.graphics.draw(spriteAsset, clip, love.graphics.getWidth() - 20 - (i * 28), 46, 0, 4, 4)
   end
 
   --[[ Debug info --]]

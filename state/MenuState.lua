@@ -34,6 +34,7 @@ function MenuState:new(config)
     itemSelected = (config and config.lastSelectedItem) or 1,
     subState = subStates[(config and config.lastSelectedItem) or 1].state,
     pause = false,
+    context = (config and config.context) or Global.context
   }
   setmetatable(object, { __index = MenuState })
   return object
@@ -82,7 +83,11 @@ function MenuState:keypressed(key)
     end
 
     self.subState = subStates[self.itemSelected].state
-    soundEvents:play("select")
+    if self.context and self.context.soundEvents then
+      self.context.soundEvents:play("select")
+    elseif soundEvents then
+      soundEvents:play("select")
+    end
   end
   if key == "down" then
     self.menuItems[self.itemSelected]:select(false)
@@ -93,6 +98,10 @@ function MenuState:keypressed(key)
     end
 
     self.subState = subStates[self.itemSelected].state
-    soundEvents:play("select")
+    if self.context and self.context.soundEvents then
+      self.context.soundEvents:play("select")
+    elseif soundEvents then
+      soundEvents:play("select")
+    end
   end
 end

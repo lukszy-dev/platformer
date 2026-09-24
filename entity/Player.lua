@@ -9,6 +9,7 @@ function Player:new(objectName, playerX, playerY)
   local object = {
     name = objectName,
     x = playerX, y = playerY,
+    context = Global and Global.context or nil,
     width = 8, height = 8,
     xSpeed = 0, ySpeed = 0,
     jumpSpeed = -130, runSpeed = 70,
@@ -94,6 +95,7 @@ end
 function Player:shot()
   self.firedShots = self.firedShots + 1
 
+  local sound = (self.context and self.context.soundEvents) or soundEvents
   local bullet = Ammo:new(self.x, self.y, self.selectedWeapon, 120)
   bullet.xScale = self.xScale
   bullet.xOffset = self.xOffset
@@ -106,7 +108,9 @@ function Player:shot()
 
   table.insert(self.shots, bullet)
 
-  soundEvents:play("shot")
+  if sound then
+    sound:play("shot")
+  end
 end
 
 function Player:getAnimationQuad()
@@ -119,7 +123,8 @@ end
 
 function Player:draw()
   --Bohater
-  love.graphics.draw(sprite, self:getAnimationQuad(), self.x - (self.width / 2),
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  love.graphics.draw(spriteAsset, self:getAnimationQuad(), self.x - (self.width / 2),
     self.y - (self.height / 2), 0, self.xScale, 1, self.xOffset)
   --Strzały
   for i, v in ipairs(self.shots) do
@@ -127,7 +132,7 @@ function Player:draw()
   end
 
   if self.isSprint and self.xSpeed ~= 0 then
-    love.graphics.draw(sprite, self.sprintQuads[1],
+    love.graphics.draw(spriteAsset, self.sprintQuads[1],
       self.x - self.direction * (self.width * math.abs(0.5 + self.direction)),
       self.y - (self.height / 2),
       0, self.xScale, 1, self.xOffset)
@@ -170,7 +175,10 @@ function Player:enemyColliding(entities)
     for _, w in pairs(enemies) do
       if w:touchesObject(self) and not self.immune then
         self.isPoked = true
-        soundEvents:play("punch")
+        local sound = (self.context and self.context.soundEvents) or soundEvents
+        if sound then
+          sound:play("punch")
+        end
 
         if self.immune == false then
           self.immune = true
@@ -218,7 +226,10 @@ function Player:ammoUpdate(dt, world)
 
           v.toRemove = true
           world.score = world.score + 50
-          soundEvents:play("hit")
+          local sound = (self.context and self.context.soundEvents) or soundEvents
+          if sound then
+            sound:play("hit")
+          end
         end
       end
     end
