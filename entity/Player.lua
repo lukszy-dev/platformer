@@ -1,5 +1,8 @@
 require "entity.Ammo"
 require "utils.Animation"
+require "entity.player.PlayerInput"
+require "entity.player.PlayerPhysics"
+require "entity.player.PlayerCombat"
 
 local Quad = love.graphics.newQuad
 
@@ -50,6 +53,10 @@ function Player:new(objectName, playerX, playerY)
       Quad(56, 72, 8, 8, 160, 144)
     }
   }
+  object.input = PlayerInput:new(object)
+  object.physics = PlayerPhysics:new(object)
+  object.combat = PlayerCombat:new(object)
+
   setmetatable(object, { __index = Player })
   return object
 end
@@ -244,70 +251,10 @@ function Player:ammoUpdate(dt, world)
 end
 
 function Player:update(dt, world)
-  local halfX = math.floor(self.width / 2)
-  local halfY = math.floor(self.height / 2)
-
-  self.ySpeed = self.ySpeed + (world.gravity * dt)
-
-  --Kolizje w pionie
-  local nextY = self.y + (self.ySpeed * dt)
-  if self.ySpeed < 0 then
-    if not (self:mapColliding(world.map, self.x - halfX, nextY - halfY))
-    and not (self:mapColliding(world.map, self.x + halfX - 1, nextY - halfY)) then
-      self.y = nextY
-      self.onGround = false
-    else
-      self.y = nextY + world.map.tileheight - ((nextY - halfY) % world.map.tileheight)
-      self:collide("ceiling")
-    end
-  elseif self.ySpeed > 0 then
-    if not (self:mapColliding(world.map, self.x - halfX, nextY + halfY))
-    and not (self:mapColliding(world.map, self.x + halfX - 1, nextY + halfY)) then
-      self.y = nextY
-      self.onGround = false
-    else
-      self.y = nextY - ((nextY + halfY) % world.map.tileheight)
-      self:collide("floor")
-    end
-  end
-
-  --Kolizje w poziomie
-  local nextX = self.x + (self.xSpeed * dt)
-  if self.xSpeed > 0 then
-    if not (self:mapColliding(world.map, nextX + halfX, self.y - halfY))
-    and not (self:mapColliding(world.map, nextX + halfX, self.y + halfY - 1)) then
-      self.x = nextX
-    else
-      self.x = nextX - ((nextX + halfX) % world.map.tilewidth)
-    end
-  elseif self.xSpeed < 0 then
-    if not (self:mapColliding(world.map, nextX - halfX, self.y - halfY))
-    and not (self:mapColliding(world.map, nextX - halfX, self.y + halfY - 1)) then
-      self.x = nextX
-    else
-      self.x = nextX + world.map.tilewidth - ((nextX - halfX) % world.map.tilewidth)
-    end
-  end
-
-  --Ograniczenie ruchu do wielkości mapy
-  if self.x + halfX > world.map.tilewidth * world.map.width then
-    self.x = world.map.tilewidth * world.map.width - halfX
-  elseif self.x - halfX < 0 then
-    self.x = halfX
-  end
-
-  --Aktualizacja pocisków
+  self.physics:applyMovement(world, dt)
   self:ammoUpdate(dt, world)
+  self.combat:handleEnemyCollisions(world.entities)
 
-  --Kolizja z przeciwnikami
-  self:enemyColliding(world.entities)
-
-  --Ograniczenie prędkości spadania
-  if self.ySpeed > 224 then
-    self.ySpeed = 224
-  end
-
-  --Nietykalność
   if self.immuneTime > 0 then
     self.immuneTime = self.immuneTime - dt
     if self.immuneTime <= 0 then
@@ -316,21 +263,7 @@ function Player:update(dt, world)
   end
 
   self:updateAnimations(dt)
-
-  if self.direction == 1 then
-    self:moveRight()
-  elseif self.direction == -1 then
-    self:moveLeft()
-  end
-
-  if self.isSprint then
-    self:sprint()
-  end
-
-  if not love.keyboard.isDown("left") and not love.keyboard.isDown("right") and not self.isPoked then
-    self:stop()
-  end
-
+  self.physics:applyDirectionalVelocity()
   self.isSprint = love.keyboard.isDown("lshift")
 
   self.state = self:getState()
@@ -352,37 +285,9 @@ function Player:getState()
 end
 
 function Player:keypressed(key)
-  if not self.isPoked then
-    if key == "right" and not love.keyboard.isDown("left") then --prawo
-      self.direction = 1
-    elseif key == "left" and not love.keyboard.isDown("right") then --lewo
-      self.direction = -1
-    end
-
-    if key == "z" and not self.hasJumped then --skok
-      self:jump()
-      self.hasJumped = true
-    end
-    if key == "r" then
-      self.firedShots = 0
-    end
-    if (key == "x") and (self.firedShots < 5) then
-      self:shot()
-    end
-  end
+  self.input:handleKeyPressed(key)
 end
 
 function Player:keyreleased(key)
-  if key == "z" then
-    self.hasJumped = false
-  end
-  if key == "right" then --prawo
-    if love.keyboard.isDown("left") then
-      self.direction = -1
-    end
-  elseif key == "left" then --lewo
-    if love.keyboard.isDown("right") then
-      self.direction = 1
-    end
-  end
+  self.input:handleKeyReleased(key)
 end
