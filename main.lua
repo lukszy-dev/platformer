@@ -7,6 +7,7 @@ require "event.SoundEvents"
 local MathUtils = require "utils.MathUtils"
 local SystemPropertyType = require "utils.properties.SystemPropertyType"
 local GameContext = require "GameContext"
+local GameConfig = require "config.GameConfig"
 local Global = require "Global"
 
 local handleAudioPropertyChange
@@ -56,9 +57,9 @@ function handleVsyncPropertyChange()
   local isVsync = Global.properties:get(SystemPropertyType.VSYNC)
   print(SystemPropertyType.VSYNC, isVsync)
   if tostring(isVsync) == "true" then
-    love.window.setMode(Global.windowWidth, Global.windowHeight, { vsync = true })
+    love.window.setMode(GameConfig.windowWidth, GameConfig.windowHeight, { vsync = true })
   else
-    love.window.setMode(Global.windowWidth, Global.windowHeight, { vsync = false })
+    love.window.setMode(GameConfig.windowWidth, GameConfig.windowHeight, { vsync = false })
   end
 end
 

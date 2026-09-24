@@ -13,6 +13,7 @@ require "entity.Cloud"
 require "utils.Camera"
 
 local Global = require "Global"
+local GameConfig = require "config.GameConfig"
 local CollectionUtils = require "utils.CollectionUtils"
 local STI = require "lib.SimpleTiledImpl.sti"
 local ENTITY_NAMES = require "constants.EntityNames"
@@ -34,8 +35,8 @@ function World:new(config)
   }
 
   object.camera = Camera:new()
-  object.camera.scaleX = Global.scale
-  object.camera.scaleY = Global.scale
+  object.camera.scaleX = GameConfig.scale
+  object.camera.scaleY = GameConfig.scale
 
   setmetatable(object, { __index = World })
   return object
@@ -78,8 +79,8 @@ function World:init(level)
     end
   end
 
-  self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (Global.windowWidth * self.camera.scaleX),
-    (self.map.height * self.map.tileheight) - (Global.windowHeight * self.camera.scaleX))
+  self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (GameConfig.windowWidth * self.camera.scaleX),
+    (self.map.height * self.map.tileheight) - (GameConfig.windowHeight * self.camera.scaleX))
 end
 
 function World:update(dt)
@@ -93,11 +94,11 @@ function World:update(dt)
   end
 
   if self.camera.activated then
-    self.camera:flowX(dt, self.player.x - Global.windowWidth / self.map.tilewidth,
-      self.player.y - Global.windowHeight / self.map.tileheight, 80)
+    self.camera:flowX(dt, self.player.x - GameConfig.windowWidth / self.map.tilewidth,
+      self.player.y - GameConfig.windowHeight / self.map.tileheight, 80)
   else
-    self.camera:setPosition(self.player.x - Global.windowWidth / self.map.tilewidth,
-      self.player.y - Global.windowHeight / self.map.tileheight)
+    self.camera:setPosition(self.player.x - GameConfig.windowWidth / self.map.tilewidth,
+      self.player.y - GameConfig.windowHeight / self.map.tileheight)
   end
 end
 
@@ -154,8 +155,8 @@ end
 
 function World:change(level)
   self:init(level)
-  self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (Global.windowWidth * self.camera.scaleX),
-    (self.map.height * self.map.tileheight) - (Global.windowHeight * self.camera.scaleX))
+  self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (GameConfig.windowWidth * self.camera.scaleX),
+    (self.map.height * self.map.tileheight) - (GameConfig.windowHeight * self.camera.scaleX))
 end
 
 function World:keyreleased(key)
