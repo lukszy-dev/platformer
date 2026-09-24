@@ -7,6 +7,7 @@ function Cloud:new(cloudX, cloudY)
   local object = {
     x = cloudX,
     y = cloudY,
+    context = Global and Global.context or nil,
     width = 8,
     height = 8,
     xSpeed = 10,
@@ -24,8 +25,9 @@ function init(object)
 end
 
 function Cloud:draw()
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
   for i, v in ipairs(self.Quads) do
-    love.graphics.draw(sprite, v, (self.x - (self.width / 2)) + 8 * (i - 1), self.y - (self.height / 2))
+    love.graphics.draw(spriteAsset, v, (self.x - (self.width / 2)) + 8 * (i - 1), self.y - (self.height / 2))
   end
 end
 

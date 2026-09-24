@@ -9,6 +9,7 @@ function Behemoth:new(objectName, behemothX, behemothY)
   local object = {
     name = objectName,
     x = behemothX, y = behemothY,
+    context = Global and Global.context or nil,
     width = 8, height = 8,
     xSpeed = 0, ySpeed = 0,
     state = "move",

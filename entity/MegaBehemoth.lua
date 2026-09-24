@@ -10,6 +10,7 @@ function MegaBehemoth:new(objectName, behemothX, behemothY)
   local object = {
     name = objectName,
     x = behemothX, y = behemothY,
+    context = Global and Global.context or nil,
     width = 16, height = 16,
     xSpeed = 0, ySpeed = 0,
     state = "move",
@@ -30,7 +31,8 @@ function MegaBehemoth:new(objectName, behemothX, behemothY)
 end
 
 function MegaBehemoth:draw()
-  love.graphics.draw(sprite, self.animations.move[1], self.x - (self.width / 2),
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  love.graphics.draw(spriteAsset, self.animations.move[1], self.x - (self.width / 2),
       self.y - (self.height / 2), 0, self.xScale, 1, self.xOffset)
 
   -- love.graphics.rectangle('line', self.x - (self.width / 2), self.y - (self.height / 2), 
