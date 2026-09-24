@@ -2,10 +2,13 @@ local GameContext = {}
 
 function GameContext:new()
   local object = {
+    title = nil,
+    copyright = nil,
     assets = {},
     state = nil,
     properties = nil,
     scores = nil,
+    propertiesEvents = nil,
     soundEvents = nil,
     mainTheme = nil,
     windowWidth = love.graphics.getWidth(),

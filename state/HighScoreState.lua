@@ -22,8 +22,10 @@ function HighScoreState:update(dt)
 end
 
 function HighScoreState:draw()
+  local scores = (self.context and self.context.scores) or Global.scores
   local prefix = ""
-  for i, score, name in Global.scores() do
+
+  for i, score, name in scores() do
     if i == 1 then
       prefix = "1ST"
     elseif i == 2 then

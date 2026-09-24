@@ -27,8 +27,15 @@ function State:set(name, additionalConfig)
   local StateToSet = STATES[STATE_NAMES.MENU]
 
   if name == STATE_NAMES.EXIT then
-    Global.scores:save()
-    Global.properties:save()
+    local scores = (self.context and self.context.scores) or Global.scores
+    local properties = (self.context and self.context.properties) or Global.properties
+
+    if scores then
+      scores:save()
+    end
+    if properties then
+      properties:save()
+    end
     love.event.quit()
     return
   end
@@ -96,8 +103,6 @@ function State:keypressed(key)
   if key == "escape" then
     if self.context and self.context.mainTheme then
       self.context.mainTheme:stop()
-    elseif mainTheme then
-      mainTheme:stop()
     end
 
     if self.currentState.parentMenu then

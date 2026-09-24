@@ -19,8 +19,6 @@ function GameState:init()
 
   if self.context and self.context.mainTheme then
     self.context.mainTheme:play()
-  elseif mainTheme then
-    mainTheme:play()
   end
 
   self.isEnd = false
@@ -32,8 +30,6 @@ function GameState:update(dt)
   if not self.world.player:isAlive(self.world.map) then
     if self.context and self.context.mainTheme then
       self.context.mainTheme:stop()
-    elseif mainTheme then
-      mainTheme:stop()
     end
     self.isEnd = true
   end

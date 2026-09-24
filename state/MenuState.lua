@@ -59,8 +59,11 @@ end
 function MenuState:draw()
   love.graphics.setColor(196 / 255, 207 / 255, 161 / 255)
 
-  love.graphics.print(Global.title, 10, 5)
-  love.graphics.print(Global.copyright, 10, 285)
+  local title = (self.context and self.context.title) or Global.title
+  local copyright = (self.context and self.context.copyright) or Global.copyright
+
+  love.graphics.print(title, 10, 5)
+  love.graphics.print(copyright, 10, 285)
 
   for _, v in ipairs(self.menuItems) do
     v:draw()

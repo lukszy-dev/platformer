@@ -16,7 +16,9 @@ function SettingsState:new(config)
 end
 
 function SettingsState:init()
-  for i, name, value in Global.properties() do
+  local properties = (self.context and self.context.properties) or Global.properties
+
+  for i, name, value in properties() do
     table.insert(self.menuItems, MenuItem:new(name .. ' ' .. tostring(value), 90 + 30 * (i - 1)))
   end
 
@@ -75,11 +77,16 @@ function SettingsState:keypressed(key)
     end
   end
   if key == "left" or key == "right" then
-    local name, value = unpack(Global.properties.properties[self.entrySelected])
+    local properties = (self.context and self.context.properties) or Global.properties
+    local propertyEvents = (self.context and self.context.propertiesEvents) or Global.propertiesEvents
+
+    local name, value = unpack(properties.properties[self.entrySelected])
     local booleanValue = (tostring(value) == "true")
-    Global.properties:add(name, not booleanValue)
+    properties:add(name, not booleanValue)
     self.menuItems[self.entrySelected]:setLabel(name .. ' ' .. tostring(not booleanValue))
 
-    Global.propertiesEvents:invoke(name)
+    if propertyEvents then
+      propertyEvents:invoke(name)
+    end
   end
 end

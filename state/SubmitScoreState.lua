@@ -97,10 +97,12 @@ function SubmitScoreState:keypressed(key)
 
   if key == "return" or key == "enter" then
     local name = ""
+    local scores = (self.context and self.context.scores) or Global.scores
+
     for i = 1, 3 do
       name = name .. self.submitName[i]
     end
 
-		Global.scores:add(name, self.score)
+		scores:add(name, self.score)
 	end
 end
