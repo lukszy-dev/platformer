@@ -15,7 +15,8 @@ function SubmitScoreState:new(config)
     itemSelected = 1,
     submitName = {},
     parentMenu = "scores",
-    score = (config and config.score) or nil
+    score = (config and config.score) or nil,
+    context = (config and config.context) or Global.context
   }
   setmetatable(object, { __index = SubmitScoreState })
   return object

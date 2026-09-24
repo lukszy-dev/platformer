@@ -4,9 +4,10 @@ local Global = require "Global"
 
 HighScoreState = {}
 
-function HighScoreState:new()
+function HighScoreState:new(config)
   local object = {
-    parentMenu = "menu"
+    parentMenu = "menu",
+    context = (config and config.context) or Global.context
   }
   setmetatable(object, { __index = HighScoreState })
   return object
