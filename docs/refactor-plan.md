@@ -1,5 +1,20 @@
 # Refactoring plan
 
+## Status
+The project has already completed the key maintainability milestones in the current refactor branch:
+- shared game context and runtime bootstrap cleanup
+- player decomposition into input, physics, and combat modules
+- world and entity dependency cleanup
+- state-screen context consistency pass
+- runtime config centralization
+
+## Remaining follow-up work
+The codebase is in a much healthier state, but a few refinements remain for long-term maintainability:
+- extract animation handling from `Player` into a dedicated `PlayerAnimator` module
+- create helper functions for map-object spawning to reduce `World:init` complexity
+- standardize naming and comments across the remaining legacy files
+- continue reducing late-stage global fallbacks once the game is fully validated in LÖVE2D
+
 ## Phase 1: Introduce a shared game context
 ### Objective
 Remove direct, hidden reliance on Lua globals and centralize shared runtime state.

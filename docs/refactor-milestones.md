@@ -5,14 +5,14 @@
 Reduce bootstrapping complexity and make startup dependencies explicit.
 
 ### Checklist
-- [ ] Review all runtime globals used during startup in `main.lua`
-- [ ] Identify which values are truly global application state
-- [ ] Create a central `GameContext` or `App` container
-- [ ] Move asset references into the context
-- [ ] Move settings and score state into the context
-- [ ] Update `main.lua` to initialize the context once
-- [ ] Ensure `State` receives the context instead of using global state directly
-- [ ] Validate that the game still starts and reaches the menu
+- [x] Review all runtime globals used during startup in `main.lua`
+- [x] Identify which values are truly global application state
+- [x] Create a central `GameContext` or `App` container
+- [x] Move asset references into the context
+- [x] Move settings and score state into the context
+- [x] Update `main.lua` to initialize the context once
+- [x] Ensure `State` receives the context instead of using global state directly
+- [x] Validate that the game still starts and reaches the menu
 
 ### Definition of done
 The game loads without relying on implicit Lua globals for shared runtime data.
@@ -24,12 +24,12 @@ The game loads without relying on implicit Lua globals for shared runtime data.
 Make transitions and state logic explicit and easier to debug.
 
 ### Checklist
-- [ ] Review state methods in `state/State.lua`
-- [ ] Define a consistent state lifecycle interface
-- [ ] Document how states are initialized and switched
-- [ ] Replace hidden global lookups with injected dependencies
-- [ ] Confirm menu, settings, score screens still work
-- [ ] Verify exit and return behavior still functions correctly
+- [x] Review state methods in `state/State.lua`
+- [x] Define a consistent state lifecycle interface
+- [x] Document how states are initialized and switched
+- [x] Replace hidden global lookups with injected dependencies
+- [x] Confirm menu, settings, score screens still work
+- [x] Verify exit and return behavior still functions correctly
 
 ### Definition of done
 State changes are explicit and do not depend on hidden runtime variables.
@@ -41,15 +41,15 @@ State changes are explicit and do not depend on hidden runtime variables.
 Decompose the oversized player object into smaller, purpose-specific modules.
 
 ### Checklist
-- [ ] Identify all responsibilities currently handled by `entity/Player.lua`
-- [ ] Extract input handling into a dedicated module
-- [ ] Extract movement and collision logic into a dedicated module
-- [ ] Extract shooting and ammo logic into a dedicated module
+- [x] Identify all responsibilities currently handled by `entity/Player.lua`
+- [x] Extract input handling into a dedicated module
+- [x] Extract movement and collision logic into a dedicated module
+- [x] Extract shooting and ammo logic into a dedicated module
 - [ ] Extract animation updates into a dedicated module
-- [ ] Keep `Player` as a coordinator object
-- [ ] Preserve all current movement and jump rules
-- [ ] Preserve all current projectile and damage rules
-- [ ] Confirm player still reacts the same way to keyboard input
+- [x] Keep `Player` as a coordinator object
+- [x] Preserve all current movement and jump rules
+- [x] Preserve all current projectile and damage rules
+- [x] Confirm player still reacts the same way to keyboard input
 
 ### Definition of done
 `Player` no longer mixes physics, input, animation, and combat responsibilities in one object.
@@ -61,13 +61,13 @@ Decompose the oversized player object into smaller, purpose-specific modules.
 Make world setup easier to trace and extend.
 
 ### Checklist
-- [ ] Review `World:init` and object creation flow
-- [ ] Identify all map object parsing responsibilities
+- [x] Review `World:init` and object creation flow
+- [x] Identify all map object parsing responsibilities
 - [ ] Create helper functions for entity spawning
-- [ ] Centralize entity type registration
-- [ ] Reduce ad hoc conditionals in world creation
-- [ ] Ensure all entity names and types still map correctly
-- [ ] Verify map loading still creates the same entities
+- [x] Centralize entity type registration
+- [x] Reduce ad hoc conditionals in world creation
+- [x] Ensure all entity names and types still map correctly
+- [x] Verify map loading still creates the same entities
 
 ### Definition of done
 World setup is easier to follow and new entities can be added with less duplication.
@@ -79,12 +79,12 @@ World setup is easier to follow and new entities can be added with less duplicat
 Create a clearer, more predictable spawn model.
 
 ### Checklist
-- [ ] Review all entity definitions under `entity/`
-- [ ] Confirm naming conventions across entity classes
-- [ ] Make spawn metadata consistent
-- [ ] Centralize entity mapping in a registry
-- [ ] Verify object properties are still respected
-- [ ] Ensure enemies, pickups, platforms, and hazards spawn correctly
+- [x] Review all entity definitions under `entity/`
+- [x] Confirm naming conventions across entity classes
+- [x] Make spawn metadata consistent
+- [x] Centralize entity mapping in a registry
+- [x] Verify object properties are still respected
+- [x] Ensure enemies, pickups, platforms, and hazards spawn correctly
 
 ### Definition of done
 Entity creation follows a single pattern and is easier to extend without touching multiple files.
@@ -96,11 +96,11 @@ Entity creation follows a single pattern and is easier to extend without touchin
 Reduce hardcoded tuning and improve code clarity.
 
 ### Checklist
-- [ ] Locate magic numbers in gameplay classes
-- [ ] Identify values that should be treated as configuration
-- [ ] Move tuning values to config or constants modules
-- [ ] Keep gameplay code focused on behavior rather than numbers
-- [ ] Validate that movement balance remains unchanged
+- [x] Locate magic numbers in gameplay classes
+- [x] Identify values that should be treated as configuration
+- [x] Move tuning values to config or constants modules
+- [x] Keep gameplay code focused on behavior rather than numbers
+- [x] Validate that movement balance remains unchanged
 
 ### Definition of done
 Gameplay tuning values are organized and easier to adjust without editing logic.
