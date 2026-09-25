@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="60" height="15" tilewidth="8" tileheight="8">
  <tileset firstgid="1" name="PixelArtTest" tilewidth="8" tileheight="8">
-  <image source="../images/PixelArtTest.png" width="160" height="144"/>
+    <image source="../images/PixelArtTest.png" width="160" height="144"/>
   <tile id="0">
    <properties>
     <property name="behemoth" value=""/>

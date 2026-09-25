@@ -12,7 +12,7 @@ return {
   properties = {},
   tilesets = {
     {
-      name = "PixelArtTest",
+      name = "tileset",
       firstgid = 1,
       filename = "tileset.tsx",
       tilewidth = 8,
