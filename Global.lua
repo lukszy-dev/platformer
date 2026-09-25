@@ -1,4 +1,4 @@
--- Zmienne globalne
+-- Shared application metadata and runtime state.
 
 local GameConfig = require "config.GameConfig"
 

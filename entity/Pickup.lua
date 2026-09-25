@@ -11,7 +11,7 @@ function Pickup:new(objectName, pickupX, pickupY, pickupProperties)
     width = 8,
     height = 8,
     value = pickupProperties.value or 0,
-    quads = Quad(136, 72, 8, 8, 160, 144) --Klatki animacji
+    quads = Quad(136, 72, 8, 8, 160, 144) -- Animation frame
   }
   setmetatable(object, { __index = Pickup })
   return object

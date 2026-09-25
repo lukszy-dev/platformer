@@ -44,8 +44,8 @@ function Player:jump()
   end
 end
 
-function Player:specialJump(strenght)
-  self.ySpeed = self.jumpSpeed - strenght
+function Player:specialJump(strength)
+  self.ySpeed = self.jumpSpeed - strength
   self.jumpCount = 0
 end
 
@@ -104,11 +104,11 @@ function Player:updateAnimations(dt)
 end
 
 function Player:draw()
-  --Bohater
+  -- Draw the player.
   local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
   love.graphics.draw(spriteAsset, self:getAnimationQuad(), self.x - (self.width / 2),
     self.y - (self.height / 2), 0, self.xScale, 1, self.xOffset)
-  --Strzały
+  -- Draw active projectiles.
   for i, v in ipairs(self.shots) do
     v:draw()
   end
@@ -217,7 +217,7 @@ function Player:ammoUpdate(dt, world)
     end
 
     if v.toRemove then
-      v:splashAnimation(dt, 0.10, 4) -- 4 klatki żeby animacja się skończyła
+      v:splashAnimation(dt, 0.10, 4) -- Four frames complete the splash animation.
       if v.iterator == 4 then
         table.remove(self.shots, i)
       end

@@ -13,7 +13,7 @@ function Button:new(objectName, buttonX, buttonY, buttonProperties)
     iterator = 1,
     isPressed = false,
     interact = buttonProperties.interact or nil,
-    animationQuads = { --Klatki animacji
+    animationQuads = { -- Animation frames
       Quad(104, 104, 8, 8, 160, 144),
       Quad(104, 112, 8, 8, 160, 144)}
   }

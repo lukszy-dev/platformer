@@ -41,7 +41,7 @@ Split the responsibilities currently combined in `entity/Player.lua` into smalle
 - input handling
 - physics and collision
 - combat and bullet management
-- animation updates
+- animation updates through `entity/player/PlayerAnimator.lua`
 - orchestration
 
 The `Player` class should remain the gameplay-facing object but delegate specialized logic.

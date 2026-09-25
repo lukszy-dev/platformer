@@ -13,7 +13,7 @@ function Spring:new(objectName, springX, springY, springProperties)
     iterator = 1,
     power = springProperties.power or 120,
     isPressed = false,
-    animationQuads = { --Klatki animacji
+    animationQuads = { -- Animation frames
       Quad(96, 104, 8, 8, 160, 144),
       Quad(96, 112, 8, 8, 160, 144)}
   }

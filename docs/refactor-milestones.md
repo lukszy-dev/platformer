@@ -112,11 +112,11 @@ Gameplay tuning values are organized and easier to adjust without editing logic.
 Make the project easier to understand for future contributors.
 
 ### Checklist
-- [ ] Review mixed-language comments and confusing names
-- [ ] Standardize naming patterns across modules
-- [ ] Update comments that describe stale or outdated behavior
-- [ ] Add brief documentation to newly extracted modules
-- [ ] Confirm the architecture matches the intended refactor design
+- [x] Review mixed-language comments and confusing names
+- [x] Standardize naming patterns across modules
+- [x] Update comments that describe stale or outdated behavior
+- [x] Add brief documentation to newly extracted modules
+- [x] Confirm the architecture matches the intended refactor design
 
 ### Definition of done
 The project is easier to navigate and understand without reading every file in full.
