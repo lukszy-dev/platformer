@@ -58,29 +58,35 @@ function World:init(level)
 
   --[[ Iterate over objects in object layer and create entities ]]
   for _, object in pairs(objectLayer.objects) do
-    if object.properties then
-      local objectName = object.properties.name
-      local objectType = object.properties.type
-      local objectPosX = object.x + object.width / 2
-      local objectPosY = object.y - object.height / 2
-
-      local Entity = ENTITY_TYPES[objectType]
-
-      if Entity then
-        local entityObject = Entity:new(objectName, objectPosX, objectPosY, object.properties)
-        entityObject.context = self.context
-
-        if objectType == ENTITY_NAMES.PLAYER then
-          self.player = entityObject
-        else
-          CollectionUtils.addToTable(self.entities, objectType, objectName, entityObject)
-        end
-      end
-    end
+    self:spawnEntity(object)
   end
 
   self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (GameConfig.windowWidth * self.camera.scaleX),
     (self.map.height * self.map.tileheight) - (GameConfig.windowHeight * self.camera.scaleX))
+end
+
+function World:spawnEntity(object)
+  if not object.properties then
+    return
+  end
+
+  local objectName = object.properties.name
+  local objectType = object.properties.type
+  local Entity = ENTITY_TYPES[objectType]
+
+  if not Entity then
+    return
+  end
+
+  local entityObject = Entity:new(objectName, object.x + object.width / 2,
+    object.y - object.height / 2, object.properties)
+  entityObject.context = self.context
+
+  if objectType == ENTITY_NAMES.PLAYER then
+    self.player = entityObject
+  else
+    CollectionUtils.addToTable(self.entities, objectType, objectName, entityObject)
+  end
 end
 
 function World:update(dt)

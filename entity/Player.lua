@@ -3,8 +3,7 @@ require "utils.Animation"
 local PlayerInput = require "entity.player.PlayerInput"
 local PlayerPhysics = require "entity.player.PlayerPhysics"
 local PlayerCombat = require "entity.player.PlayerCombat"
-
-local Quad = love.graphics.newQuad
+local PlayerAnimator = require "entity.player.PlayerAnimator"
 
 Player = {}
 
@@ -27,31 +26,7 @@ function Player:new(objectName, playerX, playerY)
     shots = {}, firedShots = 0, selectedWeapon = "bullet",
     immune = false, immuneTime = 2, isPoked = false,
     isMoving = false,
-    animations = {
-      move = {
-        operator = Animation:new(0.12, {
-          Quad( 0, 16, 8, 8, 160, 144),
-          Quad( 0, 24, 8, 8, 160, 144),
-          Quad(24, 16, 8, 8, 160, 144),
-          Quad(32, 16, 8, 8, 160, 144),
-          Quad( 0, 24, 8, 8, 160, 144),
-          Quad(40, 16, 8, 8, 160, 144)
-        })
-      },
-      stand = {
-        operator = Animation:new(0.35, {
-          Quad( 8, 16, 8, 8, 160, 144),
-          Quad(16, 16, 8, 8, 160, 144),
-          Quad( 8, 16, 8, 8, 160, 144)
-        })
-      }
-    },
-    sprintQuads = {
-      -- Quad(24, 72, 8, 8, 160, 144),
-      -- Quad(32, 72, 8, 8, 160, 144),
-      -- Quad(40, 72, 8, 8, 160, 144),
-      Quad(56, 72, 8, 8, 160, 144)
-    }
+    animator = PlayerAnimator:new()
   }
   object.input = PlayerInput:new(object)
   object.physics = PlayerPhysics:new(object)
@@ -121,11 +96,11 @@ function Player:shot()
 end
 
 function Player:getAnimationQuad()
-  return self.animations[self.state].operator:getCurrentQuad()
+  return self.animator:getCurrentQuad(self.state)
 end
 
 function Player:updateAnimations(dt)
-  self.animations[self.state].operator:update(dt)
+  self.animator:update(self.state, dt)
 end
 
 function Player:draw()
@@ -139,7 +114,7 @@ function Player:draw()
   end
 
   if self.isSprint and self.xSpeed ~= 0 then
-    love.graphics.draw(spriteAsset, self.sprintQuads[1],
+    love.graphics.draw(spriteAsset, self.animator:getSprintQuad(),
       self.x - self.direction * (self.width * math.abs(0.5 + self.direction)),
       self.y - (self.height / 2),
       0, self.xScale, 1, self.xOffset)

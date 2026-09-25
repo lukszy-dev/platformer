@@ -218,6 +218,7 @@ local function testPlayerConstruction()
   assert(player.input ~= nil, "player creates input component")
   assert(player.physics ~= nil, "player creates physics component")
   assert(player.combat ~= nil, "player creates combat component")
+  assert(player.animator ~= nil, "player creates animator component")
   assertEqual(player.x, 10, "player preserves initial x position")
   assertEqual(player.y, 20, "player preserves initial y position")
 end

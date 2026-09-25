@@ -45,7 +45,7 @@ Decompose the oversized player object into smaller, purpose-specific modules.
 - [x] Extract input handling into a dedicated module
 - [x] Extract movement and collision logic into a dedicated module
 - [x] Extract shooting and ammo logic into a dedicated module
-- [ ] Extract animation updates into a dedicated module
+- [x] Extract animation updates into a dedicated module
 - [x] Keep `Player` as a coordinator object
 - [x] Preserve all current movement and jump rules
 - [x] Preserve all current projectile and damage rules
@@ -63,7 +63,7 @@ Make world setup easier to trace and extend.
 ### Checklist
 - [x] Review `World:init` and object creation flow
 - [x] Identify all map object parsing responsibilities
-- [ ] Create helper functions for entity spawning
+- [x] Create helper functions for entity spawning
 - [x] Centralize entity type registration
 - [x] Reduce ad hoc conditionals in world creation
 - [x] Ensure all entity names and types still map correctly
