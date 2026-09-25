@@ -128,14 +128,14 @@ The project is easier to navigate and understand without reading every file in f
 Confirm the refactor preserved gameplay behavior and project viability.
 
 ### Checklist
-- [ ] Run the game after each milestone
-- [ ] Test menu navigation
-- [ ] Test start of level and gameplay loop
-- [ ] Test player movement and jumping
-- [ ] Test shooting and enemy damage
-- [ ] Test level transitions and death/end state
-- [ ] Confirm saving/loading of settings and scores still works
-- [ ] Check for obvious regressions or broken imports
+- [x] Run the game after each milestone
+- [x] Test menu navigation
+- [x] Test start of level and gameplay loop
+- [x] Test player movement and jumping
+- [x] Test shooting and enemy damage
+- [x] Test level transitions and death/end state
+- [x] Confirm saving/loading of settings and scores still works
+- [x] Check for obvious regressions or broken imports
 
 ### Definition of done
 The project remains runnable and functionally equivalent to the pre-refactor state.
