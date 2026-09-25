@@ -7,12 +7,13 @@ function Spring:new(objectName, springX, springY, springProperties)
     name = objectName,
     x = springX,
     y = springY,
+    context = Global and Global.context or nil,
     width = 8,
     height = 8,
     iterator = 1,
     power = springProperties.power or 120,
     isPressed = false,
-    animationQuads = { --Klatki animacji
+    animationQuads = { -- Animation frames
       Quad(96, 104, 8, 8, 160, 144),
       Quad(96, 112, 8, 8, 160, 144)}
   }
@@ -21,17 +22,22 @@ function Spring:new(objectName, springX, springY, springProperties)
 end
 
 function Spring:update(dt, world)
+  local sound = (self.context and self.context.soundEvents) or soundEvents
+
   if self:touchesObject(world.player) then
     self.iterator = 2
     world.player:specialJump(self.power)
-    soundEvents:play("jump")
+    if sound then
+      sound:play("jump")
+    end
   elseif world.player.ySpeed > 0 then
     self.iterator = 1
   end
 end
 
 function Spring:draw()
-  love.graphics.draw(sprite, self.animationQuads[self.iterator], self.x - (self.width / 2),
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  love.graphics.draw(spriteAsset, self.animationQuads[self.iterator], self.x - (self.width / 2),
       self.y - (self.height / 2))
 end
 

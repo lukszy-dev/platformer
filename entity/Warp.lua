@@ -7,6 +7,7 @@ function Warp:new(objectName, warpX, warpY)
     name = objectName,
     x = warpX,
     y = warpY,
+    context = Global and Global.context or nil,
     width = 8,
     height = 8
   }
@@ -15,11 +16,15 @@ function Warp:new(objectName, warpX, warpY)
 end
 
 function Warp:update(dt, world)
+  local sound = (self.context and self.context.soundEvents) or soundEvents
+
   if self:touchesObject(world.player) then
     world.currentMap = world.currentMap + 1
     world:change("map" .. world.currentMap)
 
-    soundEvents:play("warp")
+    if sound then
+      sound:play("warp")
+    end
   end
 end
 

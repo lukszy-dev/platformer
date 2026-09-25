@@ -13,6 +13,7 @@ require "entity.Cloud"
 require "utils.Camera"
 
 local Global = require "Global"
+local GameConfig = require "config.GameConfig"
 local CollectionUtils = require "utils.CollectionUtils"
 local STI = require "lib.SimpleTiledImpl.sti"
 local ENTITY_NAMES = require "constants.EntityNames"
@@ -20,7 +21,7 @@ local ENTITY_TYPES = require "constants.EntityTypes"
 
 World = {}
 
-function World:new()
+function World:new(config)
   local object = {
     camera = {},
     map = {},
@@ -29,12 +30,13 @@ function World:new()
     player = {},
     entities = {},
     gravity = 760, --800
-    score = 0
+    score = 0,
+    context = (config and config.context) or Global.context
   }
 
   object.camera = Camera:new()
-  object.camera.scaleX = Global.scale
-  object.camera.scaleY = Global.scale
+  object.camera.scaleX = GameConfig.scale
+  object.camera.scaleY = GameConfig.scale
 
   setmetatable(object, { __index = World })
   return object
@@ -56,28 +58,35 @@ function World:init(level)
 
   --[[ Iterate over objects in object layer and create entities ]]
   for _, object in pairs(objectLayer.objects) do
-    if object.properties then
-      local objectName = object.properties.name
-      local objectType = object.properties.type
-      local objectPosX = object.x + object.width / 2
-      local objectPosY = object.y - object.height / 2
-
-      local Entity = ENTITY_TYPES[objectType]
-
-      if Entity then
-        local entityObject = Entity:new(objectName, objectPosX, objectPosY, object.properties)
-
-        if objectType == ENTITY_NAMES.PLAYER then
-          self.player = entityObject
-        else
-          CollectionUtils.addToTable(self.entities, objectType, objectName, entityObject)
-        end
-      end
-    end
+    self:spawnEntity(object)
   end
 
-  self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (Global.windowWidth * self.camera.scaleX),
-    (self.map.height * self.map.tileheight) - (Global.windowHeight * self.camera.scaleX))
+  self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (GameConfig.windowWidth * self.camera.scaleX),
+    (self.map.height * self.map.tileheight) - (GameConfig.windowHeight * self.camera.scaleX))
+end
+
+function World:spawnEntity(object)
+  if not object.properties then
+    return
+  end
+
+  local objectName = object.properties.name
+  local objectType = object.properties.type
+  local Entity = ENTITY_TYPES[objectType]
+
+  if not Entity then
+    return
+  end
+
+  local entityObject = Entity:new(objectName, object.x + object.width / 2,
+    object.y - object.height / 2, object.properties)
+  entityObject.context = self.context
+
+  if objectType == ENTITY_NAMES.PLAYER then
+    self.player = entityObject
+  else
+    CollectionUtils.addToTable(self.entities, objectType, objectName, entityObject)
+  end
 end
 
 function World:update(dt)
@@ -91,15 +100,18 @@ function World:update(dt)
   end
 
   if self.camera.activated then
-    self.camera:flowX(dt, self.player.x - Global.windowWidth / self.map.tilewidth,
-      self.player.y - Global.windowHeight / self.map.tileheight, 80)
+    self.camera:flowX(dt, self.player.x - GameConfig.windowWidth / self.map.tilewidth,
+      self.player.y - GameConfig.windowHeight / self.map.tileheight, 80)
   else
-    self.camera:setPosition(self.player.x - Global.windowWidth / self.map.tilewidth,
-      self.player.y - Global.windowHeight / self.map.tileheight)
+    self.camera:setPosition(self.player.x - GameConfig.windowWidth / self.map.tilewidth,
+      self.player.y - GameConfig.windowHeight / self.map.tileheight)
   end
 end
 
 function World:draw()
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  local hudAsset = (self.context and self.context.assets and self.context.assets.hud) or hud
+
   self.camera:set()
 
   self.map:draw()
@@ -120,15 +132,15 @@ function World:draw()
   end
 
   --[[ Draw HUD --]]
-  love.graphics.draw(hud, love.graphics.getWidth() - 168, 10, 0, 4, 4)
+  love.graphics.draw(hudAsset, love.graphics.getWidth() - 168, 10, 0, 4, 4)
   love.graphics.print({ { 196 / 255, 207 / 255, 161 / 255 }, self.score }, 10, 5)
 
   for i = 1, self.player.hitpoints do
-    love.graphics.draw(sprite, heart, love.graphics.getWidth() - 20 - (i * 28), 22, 0, 4, 4)
+    love.graphics.draw(spriteAsset, heart, love.graphics.getWidth() - 20 - (i * 28), 22, 0, 4, 4)
   end
 
   for i = 1, (5 - self.player.firedShots) do
-    love.graphics.draw(sprite, clip, love.graphics.getWidth() - 20 - (i * 28), 46, 0, 4, 4)
+    love.graphics.draw(spriteAsset, clip, love.graphics.getWidth() - 20 - (i * 28), 46, 0, 4, 4)
   end
 
   --[[ Debug info --]]
@@ -149,8 +161,8 @@ end
 
 function World:change(level)
   self:init(level)
-  self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (Global.windowWidth * self.camera.scaleX),
-    (self.map.height * self.map.tileheight) - (Global.windowHeight * self.camera.scaleX))
+  self.camera:setBounds(0, 0, (self.map.width * self.map.tilewidth) - (GameConfig.windowWidth * self.camera.scaleX),
+    (self.map.height * self.map.tileheight) - (GameConfig.windowHeight * self.camera.scaleX))
 end
 
 function World:keyreleased(key)

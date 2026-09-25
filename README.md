@@ -45,6 +45,18 @@ cd platformer
 love .
 ```
 
+## Tests
+
+Run the player unit tests and deterministic gameplay scenarios with Lua:
+
+```zsh
+lua tests/player_test.lua
+lua tests/gameplay_scenarios.lua
+```
+
+The gameplay scenarios cover state navigation, settings changes, entering a game,
+score submission, and exit persistence without requiring an interactive window.
+
 ## TODO
 
 - [ ] More levels

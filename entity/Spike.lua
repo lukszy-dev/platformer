@@ -7,6 +7,7 @@ function Spike:new(objectName, spikeX, spikeY)
     name = objectName,
     x = spikeX,
     y = spikeY,
+    context = Global and Global.context or nil,
     width = 8,
     height = 8,
     iterator = 1,
@@ -18,19 +19,24 @@ function Spike:new(objectName, spikeX, spikeY)
 end
 
 function Spike:update(dt, world)
+  local sound = (self.context and self.context.soundEvents) or soundEvents
+
   if self:touchesObject(world.player) then
     if world.player.immune == false then
       world.player.immune = true
       world.player.immuneTime = 2
       world.player.hitpoints = world.player.hitpoints - 1
-      soundEvents:play("punch")
+      if sound then
+        sound:play("punch")
+      end
     end
     --player:jump()
   end
 end
 
 function Spike:draw()
-  love.graphics.draw(sprite, self.quads[self.iterator], self.x - (self.width / 2),
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  love.graphics.draw(spriteAsset, self.quads[self.iterator], self.x - (self.width / 2),
       self.y - (self.height / 2))
 end
 

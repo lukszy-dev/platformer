@@ -1,7 +1,9 @@
 require "entity.Ammo"
 require "utils.Animation"
-
-local Quad = love.graphics.newQuad
+local PlayerInput = require "entity.player.PlayerInput"
+local PlayerPhysics = require "entity.player.PlayerPhysics"
+local PlayerCombat = require "entity.player.PlayerCombat"
+local PlayerAnimator = require "entity.player.PlayerAnimator"
 
 Player = {}
 
@@ -9,6 +11,7 @@ function Player:new(objectName, playerX, playerY)
   local object = {
     name = objectName,
     x = playerX, y = playerY,
+    context = Global and Global.context or nil,
     width = 8, height = 8,
     xSpeed = 0, ySpeed = 0,
     jumpSpeed = -130, runSpeed = 70,
@@ -23,32 +26,12 @@ function Player:new(objectName, playerX, playerY)
     shots = {}, firedShots = 0, selectedWeapon = "bullet",
     immune = false, immuneTime = 2, isPoked = false,
     isMoving = false,
-    animations = {
-      move = {
-        operator = Animation:new(0.12, {
-          Quad( 0, 16, 8, 8, 160, 144),
-          Quad( 0, 24, 8, 8, 160, 144),
-          Quad(24, 16, 8, 8, 160, 144),
-          Quad(32, 16, 8, 8, 160, 144),
-          Quad( 0, 24, 8, 8, 160, 144),
-          Quad(40, 16, 8, 8, 160, 144)
-        })
-      },
-      stand = {
-        operator = Animation:new(0.35, {
-          Quad( 8, 16, 8, 8, 160, 144),
-          Quad(16, 16, 8, 8, 160, 144),
-          Quad( 8, 16, 8, 8, 160, 144)
-        })
-      }
-    },
-    sprintQuads = {
-      -- Quad(24, 72, 8, 8, 160, 144),
-      -- Quad(32, 72, 8, 8, 160, 144),
-      -- Quad(40, 72, 8, 8, 160, 144),
-      Quad(56, 72, 8, 8, 160, 144)
-    }
+    animator = PlayerAnimator:new()
   }
+  object.input = PlayerInput:new(object)
+  object.physics = PlayerPhysics:new(object)
+  object.combat = PlayerCombat:new(object)
+
   setmetatable(object, { __index = Player })
   return object
 end
@@ -61,8 +44,8 @@ function Player:jump()
   end
 end
 
-function Player:specialJump(strenght)
-  self.ySpeed = self.jumpSpeed - strenght
+function Player:specialJump(strength)
+  self.ySpeed = self.jumpSpeed - strength
   self.jumpCount = 0
 end
 
@@ -94,6 +77,7 @@ end
 function Player:shot()
   self.firedShots = self.firedShots + 1
 
+  local sound = (self.context and self.context.soundEvents) or soundEvents
   local bullet = Ammo:new(self.x, self.y, self.selectedWeapon, 120)
   bullet.xScale = self.xScale
   bullet.xOffset = self.xOffset
@@ -106,28 +90,31 @@ function Player:shot()
 
   table.insert(self.shots, bullet)
 
-  soundEvents:play("shot")
+  if sound then
+    sound:play("shot")
+  end
 end
 
 function Player:getAnimationQuad()
-  return self.animations[self.state].operator:getCurrentQuad()
+  return self.animator:getCurrentQuad(self.state)
 end
 
 function Player:updateAnimations(dt)
-  self.animations[self.state].operator:update(dt)
+  self.animator:update(self.state, dt)
 end
 
 function Player:draw()
-  --Bohater
-  love.graphics.draw(sprite, self:getAnimationQuad(), self.x - (self.width / 2),
+  -- Draw the player.
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  love.graphics.draw(spriteAsset, self:getAnimationQuad(), self.x - (self.width / 2),
     self.y - (self.height / 2), 0, self.xScale, 1, self.xOffset)
-  --Strzały
+  -- Draw active projectiles.
   for i, v in ipairs(self.shots) do
     v:draw()
   end
 
   if self.isSprint and self.xSpeed ~= 0 then
-    love.graphics.draw(sprite, self.sprintQuads[1],
+    love.graphics.draw(spriteAsset, self.animator:getSprintQuad(),
       self.x - self.direction * (self.width * math.abs(0.5 + self.direction)),
       self.y - (self.height / 2),
       0, self.xScale, 1, self.xOffset)
@@ -170,7 +157,10 @@ function Player:enemyColliding(entities)
     for _, w in pairs(enemies) do
       if w:touchesObject(self) and not self.immune then
         self.isPoked = true
-        soundEvents:play("punch")
+        local sound = (self.context and self.context.soundEvents) or soundEvents
+        if sound then
+          sound:play("punch")
+        end
 
         if self.immune == false then
           self.immune = true
@@ -218,13 +208,16 @@ function Player:ammoUpdate(dt, world)
 
           v.toRemove = true
           world.score = world.score + 50
-          soundEvents:play("hit")
+          local sound = (self.context and self.context.soundEvents) or soundEvents
+          if sound then
+            sound:play("hit")
+          end
         end
       end
     end
 
     if v.toRemove then
-      v:splashAnimation(dt, 0.10, 4) -- 4 klatki żeby animacja się skończyła
+      v:splashAnimation(dt, 0.10, 4) -- Four frames complete the splash animation.
       if v.iterator == 4 then
         table.remove(self.shots, i)
       end
@@ -233,70 +226,10 @@ function Player:ammoUpdate(dt, world)
 end
 
 function Player:update(dt, world)
-  local halfX = math.floor(self.width / 2)
-  local halfY = math.floor(self.height / 2)
-
-  self.ySpeed = self.ySpeed + (world.gravity * dt)
-
-  --Kolizje w pionie
-  local nextY = self.y + (self.ySpeed * dt)
-  if self.ySpeed < 0 then
-    if not (self:mapColliding(world.map, self.x - halfX, nextY - halfY))
-    and not (self:mapColliding(world.map, self.x + halfX - 1, nextY - halfY)) then
-      self.y = nextY
-      self.onGround = false
-    else
-      self.y = nextY + world.map.tileheight - ((nextY - halfY) % world.map.tileheight)
-      self:collide("ceiling")
-    end
-  elseif self.ySpeed > 0 then
-    if not (self:mapColliding(world.map, self.x - halfX, nextY + halfY))
-    and not (self:mapColliding(world.map, self.x + halfX - 1, nextY + halfY)) then
-      self.y = nextY
-      self.onGround = false
-    else
-      self.y = nextY - ((nextY + halfY) % world.map.tileheight)
-      self:collide("floor")
-    end
-  end
-
-  --Kolizje w poziomie
-  local nextX = self.x + (self.xSpeed * dt)
-  if self.xSpeed > 0 then
-    if not (self:mapColliding(world.map, nextX + halfX, self.y - halfY))
-    and not (self:mapColliding(world.map, nextX + halfX, self.y + halfY - 1)) then
-      self.x = nextX
-    else
-      self.x = nextX - ((nextX + halfX) % world.map.tilewidth)
-    end
-  elseif self.xSpeed < 0 then
-    if not (self:mapColliding(world.map, nextX - halfX, self.y - halfY))
-    and not (self:mapColliding(world.map, nextX - halfX, self.y + halfY - 1)) then
-      self.x = nextX
-    else
-      self.x = nextX + world.map.tilewidth - ((nextX - halfX) % world.map.tilewidth)
-    end
-  end
-
-  --Ograniczenie ruchu do wielkości mapy
-  if self.x + halfX > world.map.tilewidth * world.map.width then
-    self.x = world.map.tilewidth * world.map.width - halfX
-  elseif self.x - halfX < 0 then
-    self.x = halfX
-  end
-
-  --Aktualizacja pocisków
+  self.physics:applyMovement(world, dt)
   self:ammoUpdate(dt, world)
+  self.combat:handleEnemyCollisions(world.entities)
 
-  --Kolizja z przeciwnikami
-  self:enemyColliding(world.entities)
-
-  --Ograniczenie prędkości spadania
-  if self.ySpeed > 224 then
-    self.ySpeed = 224
-  end
-
-  --Nietykalność
   if self.immuneTime > 0 then
     self.immuneTime = self.immuneTime - dt
     if self.immuneTime <= 0 then
@@ -305,21 +238,7 @@ function Player:update(dt, world)
   end
 
   self:updateAnimations(dt)
-
-  if self.direction == 1 then
-    self:moveRight()
-  elseif self.direction == -1 then
-    self:moveLeft()
-  end
-
-  if self.isSprint then
-    self:sprint()
-  end
-
-  if not love.keyboard.isDown("left") and not love.keyboard.isDown("right") and not self.isPoked then
-    self:stop()
-  end
-
+  self.physics:applyDirectionalVelocity()
   self.isSprint = love.keyboard.isDown("lshift")
 
   self.state = self:getState()
@@ -341,37 +260,9 @@ function Player:getState()
 end
 
 function Player:keypressed(key)
-  if not self.isPoked then
-    if key == "right" and not love.keyboard.isDown("left") then --prawo
-      self.direction = 1
-    elseif key == "left" and not love.keyboard.isDown("right") then --lewo
-      self.direction = -1
-    end
-
-    if key == "z" and not self.hasJumped then --skok
-      self:jump()
-      self.hasJumped = true
-    end
-    if key == "r" then
-      self.firedShots = 0
-    end
-    if (key == "x") and (self.firedShots < 5) then
-      self:shot()
-    end
-  end
+  self.input:handleKeyPressed(key)
 end
 
 function Player:keyreleased(key)
-  if key == "z" then
-    self.hasJumped = false
-  end
-  if key == "right" then --prawo
-    if love.keyboard.isDown("left") then
-      self.direction = -1
-    end
-  elseif key == "left" then --lewo
-    if love.keyboard.isDown("right") then
-      self.direction = 1
-    end
-  end
+  self.input:handleKeyReleased(key)
 end

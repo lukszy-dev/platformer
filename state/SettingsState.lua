@@ -4,18 +4,21 @@ local Global = require "Global"
 
 SettingsState = {}
 
-function SettingsState:new()
+function SettingsState:new(config)
   local object = {
     parentMenu = "menu",
     menuItems = {},
-    entrySelected = 1
+    entrySelected = 1,
+    context = (config and config.context) or Global.context
   }
   setmetatable(object, { __index = SettingsState })
   return object
 end
 
 function SettingsState:init()
-  for i, name, value in Global.properties() do
+  local properties = (self.context and self.context.properties) or Global.properties
+
+  for i, name, value in properties() do
     table.insert(self.menuItems, MenuItem:new(name .. ' ' .. tostring(value), 90 + 30 * (i - 1)))
   end
 
@@ -53,7 +56,11 @@ function SettingsState:keypressed(key)
       self.entrySelected = #self.menuItems
     end
 
-    soundEvents:play("select")
+    if self.context and self.context.soundEvents then
+      self.context.soundEvents:play("select")
+    elseif soundEvents then
+      soundEvents:play("select")
+    end
   end
   if key == "down" then
     self.menuItems[self.entrySelected]:select(false)
@@ -63,14 +70,23 @@ function SettingsState:keypressed(key)
       self.entrySelected = 1
     end
 
-    soundEvents:play("select")
+    if self.context and self.context.soundEvents then
+      self.context.soundEvents:play("select")
+    elseif soundEvents then
+      soundEvents:play("select")
+    end
   end
   if key == "left" or key == "right" then
-    local name, value = unpack(Global.properties.properties[self.entrySelected])
+    local properties = (self.context and self.context.properties) or Global.properties
+    local propertyEvents = (self.context and self.context.propertiesEvents) or Global.propertiesEvents
+
+    local name, value = unpack(properties.properties[self.entrySelected])
     local booleanValue = (tostring(value) == "true")
-    Global.properties:add(name, not booleanValue)
+    properties:add(name, not booleanValue)
     self.menuItems[self.entrySelected]:setLabel(name .. ' ' .. tostring(not booleanValue))
 
-    Global.propertiesEvents:invoke(name)
+    if propertyEvents then
+      propertyEvents:invoke(name)
+    end
   end
 end

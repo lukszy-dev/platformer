@@ -11,11 +11,12 @@ local STATE_NAMES = require "state.constants.StateNames"
 
 State = {}
 
-function State:new()
+function State:new(context)
   local object = {
     name = "",
     currentState = {},
-    lastSelectedItem = 1
+    lastSelectedItem = 1,
+    context = context or Global.context
   }
   setmetatable(object, { __index = State })
   return object
@@ -26,8 +27,15 @@ function State:set(name, additionalConfig)
   local StateToSet = STATES[STATE_NAMES.MENU]
 
   if name == STATE_NAMES.EXIT then
-    Global.scores:save()
-    Global.properties:save()
+    local scores = (self.context and self.context.scores) or Global.scores
+    local properties = (self.context and self.context.properties) or Global.properties
+
+    if scores then
+      scores:save()
+    end
+    if properties then
+      properties:save()
+    end
     love.event.quit()
     return
   end
@@ -36,8 +44,11 @@ function State:set(name, additionalConfig)
     StateToSet = STATES[name]
   end
 
+  self.context = self.context or Global.context
+
   local config = {
-    lastSelectedItem = self.lastSelectedItem
+    lastSelectedItem = self.lastSelectedItem,
+    context = self.context
   }
 
   if (additionalConfig) then
@@ -90,7 +101,10 @@ function State:keypressed(key)
     end
   end
   if key == "escape" then
-    mainTheme:stop()
+    if self.context and self.context.mainTheme then
+      self.context.mainTheme:stop()
+    end
+
     if self.currentState.parentMenu then
       self:set(self.currentState.parentMenu)
     else
@@ -98,11 +112,11 @@ function State:keypressed(key)
     end
   end
   if key == "g" then --garbage collector
-    print('GARBAGE_COLLECTOR')
+    print("GARBAGE_COLLECTOR")
     collectgarbage()
   end
   if key == "p" then --pause
     -- self:set(states[1])
-    print('PAUSE')
+    print("PAUSE")
   end
 end

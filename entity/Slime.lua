@@ -8,6 +8,7 @@ function Slime:new(objectName, slimeX, slimeY)
   local object = {
     name = objectName,
     x = slimeX, y = slimeY,
+    context = Global and Global.context or nil,
     width = 8, height = 8,
     xSpeed = 0, ySpeed = 0,
     state = "move",
@@ -48,7 +49,8 @@ function Slime:updateAnimations(dt)
 end
 
 function Slime:draw()
-  love.graphics.draw(sprite, self:getAnimationQuad(), self.x - (self.width / 2),
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  love.graphics.draw(spriteAsset, self:getAnimationQuad(), self.x - (self.width / 2),
       self.y - (self.height / 2), 0, self.xScale, 1, self.xOffset)
 end
 

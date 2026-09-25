@@ -9,6 +9,7 @@ function Acid:new(objectName, acidX, acidY)
     name = objectName,
     x = acidX,
     y = acidY + 1,
+    context = Global and Global.context or nil,
     initY = acidY + 1,
     width = 8,
     height = 8,
@@ -50,7 +51,8 @@ end
 
 function Acid:draw()
   local animationOperator = self:getCurrentAnimationOperator()
-  love.graphics.draw(sprite, animationOperator:getCurrentQuad(), self.x - (self.width / 2),
+  local spriteAsset = (self.context and self.context.assets and self.context.assets.sprite) or sprite
+  love.graphics.draw(spriteAsset, animationOperator:getCurrentQuad(), self.x - (self.width / 2),
     self.y - (self.height / 2), 0, self.xScale, 1, self.xOffset)
 end
 
@@ -94,7 +96,10 @@ function Acid:update(dt, world)
 
   if self:touchesObject(world.player) then
     if world.player.immune == false and self.state ~= "init" then
-      soundEvents:play("punch")
+      local sound = (self.context and self.context.soundEvents) or soundEvents
+      if sound then
+        sound:play("punch")
+      end
       world.player.immune = true
       world.player.immuneTime = 2
       world.player.hitpoints = world.player.hitpoints - 1

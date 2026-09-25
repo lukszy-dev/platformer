@@ -4,10 +4,11 @@ local Global = require "Global"
 
 ControlsMenuState = {}
 
-function ControlsMenuState:new()
+function ControlsMenuState:new(config)
   local object = {
     menuItems = {},
-    parentMenu = "menu"
+    parentMenu = "menu",
+    context = (config and config.context) or Global.context
   }
   setmetatable(object, { __index = ControlsMenuState })
   return object

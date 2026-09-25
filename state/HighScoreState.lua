@@ -4,9 +4,10 @@ local Global = require "Global"
 
 HighScoreState = {}
 
-function HighScoreState:new()
+function HighScoreState:new(config)
   local object = {
-    parentMenu = "menu"
+    parentMenu = "menu",
+    context = (config and config.context) or Global.context
   }
   setmetatable(object, { __index = HighScoreState })
   return object
@@ -21,8 +22,10 @@ function HighScoreState:update(dt)
 end
 
 function HighScoreState:draw()
+  local scores = (self.context and self.context.scores) or Global.scores
   local prefix = ""
-  for i, score, name in Global.scores() do
+
+  for i, score, name in scores() do
     if i == 1 then
       prefix = "1ST"
     elseif i == 2 then

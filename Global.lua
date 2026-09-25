@@ -1,18 +1,21 @@
--- Zmienne globalne
+-- Shared application metadata and runtime state.
+
+local GameConfig = require "config.GameConfig"
 
 local Global = {
-  title = "2D PLATFORMER",
-  copyright = "(C) 2021 LUKASZ SZYPLINSKI",
+  title = GameConfig.title,
+  copyright = GameConfig.copyright,
 
-  debug = false,
+  debug = GameConfig.debug,
 
-  windowHeight = love.graphics.getHeight(),
-  windowWidth = love.graphics.getWidth(),
+  windowHeight = GameConfig.windowHeight,
+  windowWidth = GameConfig.windowWidth,
 
+  context = nil,
   properties = {},
   scores = {},
 
-  scale = 0.25
+  scale = GameConfig.scale
 }
 
 return Global
